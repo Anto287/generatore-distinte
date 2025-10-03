@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "homepage": "https://username.github.io/generatore-distinte",
+  "homepage": "https://anto287.github.io/generatore-distinte",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
