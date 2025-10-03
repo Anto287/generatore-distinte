@@ -28,7 +28,7 @@ export default function App() {
     async function fetchSheet() {
       try {
         const sheetId = import.meta.env.VITE_SHEET_ID;
-        const gid = import.meta.env.VITE_GID ?? "0";
+        const gid = "0";
         if (!sheetId) throw new Error("VITE_SHEET_ID non impostato nel file .env");
 
         const url = buildCsvUrl(sheetId, gid);
