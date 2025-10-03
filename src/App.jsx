@@ -5,6 +5,9 @@ import {
   Row,
   Col,
   Space,
+  Input,
+  Button,
+  Modal,
 } from "antd";
 import Papa from "papaparse";
 import Loader from "./components/Loader";
@@ -18,19 +21,34 @@ function buildCsvUrl(sheetId, gid) {
 }
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [rows, setRows] = useState([]); 
   const [columns, setColumns] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
+  const [sheetId, setSheetId] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
+  // Controlla se esiste un sheetId salvato in localStorage all'avvio
   useEffect(() => {
-    async function fetchSheet() {
-      try {
-        const sheetId = import.meta.env.VITE_SHEET_ID;
-        const gid = "0";
-        if (!sheetId) throw new Error("VITE_SHEET_ID non impostato nel file .env");
+    const savedSheetId = localStorage.getItem("sheetId");
+    if (savedSheetId) {
+      setSheetId(savedSheetId);
+    } else {
+      setShowPasswordModal(true);
+    }
+  }, []);
 
+  // Quando sheetId cambia, carica i dati
+  useEffect(() => {
+    if (!sheetId) return;
+    
+    async function fetchSheet() {
+      setLoading(true);
+      setError(null);
+      try {
+        const gid = "0";
         const url = buildCsvUrl(sheetId, gid);
         const res = await fetch(url);
         if (!res.ok) throw new Error("Impossibile scaricare il foglio: " + res.status);
@@ -50,28 +68,110 @@ export default function App() {
       }
     }
     fetchSheet();
-  }, []);
+  }, [sheetId]);
+
+  const handlePasswordSubmit = () => {
+    if (!passwordInput.trim()) {
+      setError("Inserisci una password valida");
+      return;
+    }
+    localStorage.setItem("sheetId", passwordInput.trim());
+    setSheetId(passwordInput.trim());
+    setShowPasswordModal(false);
+    setPasswordInput("");
+    setError(null);
+  };
+
+  const handleChangePassword = () => {
+    setPasswordInput("");
+    setError(null);
+    setShowPasswordModal(true);
+  };
+
+  const handleClearPassword = () => {
+    localStorage.removeItem("sheetId");
+    setSheetId("");
+    setRows([]);
+    setColumns([]);
+    setSelectedList([]);
+    setPasswordInput("");
+    setError(null);
+    setShowPasswordModal(true);
+  };
 
   if (loading) return <Loader />;
-  if (error)
+  
+  if (error && sheetId) {
     return (
       <div style={{ padding: 16 }}>
         <Card>
           <Title level={4}>Errore</Title>
           <Text>{error}</Text>
           <div style={{ marginTop: 16 }}>
-            <Text>Controlla che il foglio sia pubblico e che VITE_SHEET_ID sia impostato in .env</Text>
+            <Text>Controlla che il foglio sia pubblico e che la password sia corretto</Text>
+          </div>
+          <div style={{ marginTop: 16 }}>
+            <Space>
+              <Button type="primary" onClick={handleChangePassword}>
+                Cambia password
+              </Button>
+              <Button danger onClick={handleClearPassword}>
+                Reset
+              </Button>
+            </Space>
           </div>
         </Card>
       </div>
     );
+  }
 
   return (
     <div style={{ padding: 16 }}>
+      <Modal
+        title="Password"
+        open={showPasswordModal}
+        onOk={handlePasswordSubmit}
+        onCancel={() => {
+          if (sheetId) {
+            setShowPasswordModal(false);
+            setPasswordInput("");
+            setError(null);
+          }
+        }}
+        okText="Conferma"
+        cancelText="Annulla"
+        closable={!!sheetId}
+        maskClosable={!!sheetId}
+      >
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Text>Inserisci Password:</Text>
+          <Input.Password
+            placeholder="Password"
+            value={passwordInput}
+            onChange={(e) => {
+              setPasswordInput(e.target.value);
+              setError(null);
+            }}
+            onPressEnter={handlePasswordSubmit}
+          />
+          {error && <Text type="danger">{error}</Text>}
+        </Space>
+      </Modal>
+
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={24} md={16}>
           <Card
             title="Seleziona giocatori"
+            extra={
+              <Space>
+                <Button size="small" onClick={handleChangePassword}>
+                  Cambia password
+                </Button>
+                <Button size="small" danger onClick={handleClearPassword}>
+                  Reset
+                </Button>
+              </Space>
+            }
             style={{ minHeight: 420 }}
           >
             <Space direction="vertical" style={{ width: "100%" }}>
