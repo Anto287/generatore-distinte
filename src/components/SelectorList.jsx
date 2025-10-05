@@ -319,8 +319,21 @@ export default function SelectorList({ rows, columns, onListChange }) {
                     {!isSpecial ? (
                       <InputNumber 
                         min={1} 
-                        value={item.amount} 
-                        onChange={v => updateAmount(item.id, v ?? 1)}
+                        defaultValue={item.amount}
+                        key={`${item.id}-${item.amount}`}
+                        onPressEnter={(e) => {
+                          const newValue = parseInt(e.target.value);
+                          if (!isNaN(newValue) && newValue !== item.amount) {
+                            updateAmount(item.id, newValue);
+                          }
+                          e.target.blur();
+                        }}
+                        onBlur={(e) => {
+                          const newValue = parseInt(e.target.value);
+                          if (!isNaN(newValue) && newValue !== item.amount) {
+                            updateAmount(item.id, newValue);
+                          }
+                        }}
                         style={{ width: "100%" }}
                         size="small"
                       />

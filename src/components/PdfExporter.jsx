@@ -39,7 +39,7 @@ export default function PdfExporter({ list = [] }) {
 
     tableHtml.innerHTML = `
       <div style="position: relative; text-align: center; margin-bottom: 25px;">
-        <img src="/Logo-US-Riolunato.jpg" alt="Logo" style="position: absolute; top: 0; right: 0; height: 70px; width: auto;" />
+        <img src="Logo-US-Riolunato.jpg" alt="" style="position: absolute; top: 0; right: 0; height: 70px; width: auto;" />
         <h2 style="font-size: 22px; font-weight: bold; margin: 0 0 20px 0;">DISTINTA GARA</h2>
         <div style="font-weight: bold; margin-bottom: 15px; font-size: 13px;">SQUADRA: U.S. RIOLUNATO</div>
         <div style="margin-bottom: 12px; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
