@@ -117,6 +117,7 @@ export default function SelectorList({ rows, columns, onListChange }) {
 
     setList(newList);
     setSelectedCheckbox(null);
+    setFilter("");
     message.success("Elemento aggiunto");
   }
 

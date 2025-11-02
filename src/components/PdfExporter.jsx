@@ -72,8 +72,8 @@ export default function PdfExporter({ list = [] }) {
           ${list
             .map((item) => {
               const mansNum = getMansNum(item);
-              const cognomeNome = `${item.raw?.Cognome || ""} ${
-                item.raw?.Nome || ""
+              const cognomeNome = `${item.raw?.Cognome ? item.raw?.Cognome.replace(/\s+(JR|SR)$/i, '').trim() : ""} ${
+                item.raw?.Nome ? item.raw?.Nome.replace(/\s+(JR|SR)$/i, '').trim() : ""
               }`.trim();
 
               return `<tr style="height: 28px;">
